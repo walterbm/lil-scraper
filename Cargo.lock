@@ -489,7 +489,6 @@ dependencies = [
  "hyper",
  "hyper-tls",
  "log",
- "openssl",
  "regex",
  "tokio",
  "yup-hyper-mock",

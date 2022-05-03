@@ -106,6 +106,8 @@ jobs:
     name: GitHub Release
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Query version number
         id: get_version
