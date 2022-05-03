@@ -2,6 +2,12 @@
 name = "lil-scraper"
 version = "0.1.0"
 edition = "2021"
+authors = ["Walter <walter.beller.morales@gmail.com>"]
+license = "MIT"
+readme="README.md"
+description = "CLI tool to quickly scrape short snippets of text data from multiple HTTP sources"
+categories = ["command-line-utilities"]
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
