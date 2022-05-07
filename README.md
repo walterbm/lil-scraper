@@ -8,17 +8,13 @@
 
 ## Installation
 
-Installation is currently a very manual process and will require explicitly selecting the desired version and target architecture. For example to install for Intel Macs run the following commands:
+Quickest way to install the `lil-scraper` is using the [`install.sh`](https://github.com/walterbm/lil-scraper/blob/gh-pages/install.sh) script:
 
 ```bash
-VERSION=v0.1.4 \
-  && ARCH=x86_64-apple-darwin \
-  && mkdir -p /tmp/lil-scraper \
-  && curl -sL https://github.com/walterbm/lil-scraper/releases/download/$VERSION/lil-scraper-$VERSION-$ARCH.tar.gz \
-  | tar -C /tmp/lil-scraper -xz \
-  && install -m 755 /tmp/lil-scraper/lil-scraper-$VERSION-$ARCH/lil-scraper /usr/local/bin \
-  && rm -rf /tmp/lil-scraper
+curl -LSfs https://walterbm.github.io/lil-scraper/install.sh | sh -s
 ```
+
+Alternatively you can download the most recent binary from the [Github release artifacts](https://github.com/walterbm/lil-scraper/releases)
 
 ## Usage
 
@@ -28,7 +24,7 @@ Feed `lil-scraper` a list of urls (one url per line) from stdin and pass in a re
 cat urls.txt | lil-scraper  --pattern '<i lang="es">([^<]+)</i>'
 ```
 
-This is roughly equivalent to running using `xargs` however lil-scraper will run significantly faster thanks to the tokio async runtime.
+This is roughly equivalent to running using `xargs` however lil-scraper will run significantly faster thanks to the [tokio async runtime](https://tokio.rs/).
 
 ```bash
 cat urls.txt | xargs -P 0 curl | grep -ioE '<i lang="es">([^<]+)</i>'
