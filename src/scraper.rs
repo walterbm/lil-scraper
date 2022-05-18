@@ -1,12 +1,7 @@
-use std::time::Duration;
-
 use super::ScrapeError;
-use hyper::body;
-use hyper::Client;
-use hyper::StatusCode;
-use hyper::Uri;
+use hyper::{body, Client, Uri};
 use regex::Regex;
-use tokio::task;
+use std::time::Duration;
 use tokio::time;
 
 #[derive(Clone)]
@@ -16,9 +11,9 @@ pub struct Scraper<C> {
     client: Client<C>,
 }
 
-impl<C: 'static> Scraper<C>
+impl<C> Scraper<C>
 where
-    C: hyper::client::connect::Connect + std::clone::Clone + std::marker::Send + std::marker::Sync,
+    C: hyper::client::connect::Connect + Clone + Send + Sync + 'static,
 {
     pub fn new(regex: Regex, timeout: u64, client: hyper::Client<C>) -> Self {
         Scraper {
@@ -30,7 +25,7 @@ where
 
     pub async fn scrape(&self, uri: Uri) -> Result<Option<String>, ScrapeError> {
         let data = self.request(uri).await?;
-        Ok(self.search(data).await)
+        Ok(self.search(&data).map(|s| s.to_string()))
     }
 
     async fn request(&self, uri: Uri) -> Result<String, ScrapeError> {
@@ -40,7 +35,7 @@ where
                 Err(_) => Err(ScrapeError::RequestTimeout),
             }?;
 
-        if data.status() != StatusCode::OK {
+        if !data.status().is_success() {
             return Err(ScrapeError::RequestFailed);
         }
 
@@ -48,17 +43,14 @@ where
             .await
             .map_err(|_| ScrapeError::InvalidResponse)?;
 
-        String::from_utf8(bytes.to_vec()).map_err(|_| ScrapeError::InvalidResponse)
+        Ok(String::from_utf8_lossy(&bytes).into_owned())
     }
 
-    async fn search(&self, data: String) -> Option<String> {
-        let re = self.regex.clone();
-        task::spawn_blocking(move || {
-            re.captures(&data)
-                .map(|m| m.get(1).map_or("".to_string(), |m| m.as_str().to_string()))
-        })
-        .await
-        .ok()?
+    fn search<'a>(&self, data: &'a str) -> Option<&'a str> {
+        self.regex
+            .captures(data)
+            .and_then(|m| m.get(1))
+            .map(|m| m.as_str())
     }
 }
 
@@ -66,6 +58,7 @@ where
 mod tests {
     use crate::{error::ScrapeError, scraper::Scraper};
     use regex::Regex;
+    use yup_hyper_mock::*;
 
     mock_connector!(MockResponses {
         "https://test.com" => "HTTP/1.1 200 OK\r\n\
