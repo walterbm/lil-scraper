@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-#[derive(Debug, std::cmp::PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum ScrapeError {
     InvalidResponse,
     InvalidURI,

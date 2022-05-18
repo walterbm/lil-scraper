@@ -3,25 +3,19 @@ use clap::Parser;
 use error::ScrapeError;
 use hyper::Client;
 use hyper_tls::HttpsConnector;
+use log::info;
 use regex::Regex;
 use scraper::Scraper;
-use std::io::{self, BufRead};
+use std::io::BufRead;
 use std::process;
 use std::time::Instant;
-use tokio::sync::mpsc::{self, Receiver, Sender};
+use tokio::sync::mpsc;
 
 use crate::printer::{Printer, TablePrinter, TextPrinter};
 
 mod error;
 mod printer;
 mod scraper;
-
-#[macro_use]
-extern crate log;
-
-#[cfg(test)]
-#[macro_use]
-extern crate yup_hyper_mock as hyper_mock;
 
 const CHANNEL_BUFFER: usize = 500;
 
@@ -50,14 +44,14 @@ async fn main() {
     let regex =
         Regex::new(&args.pattern).expect("Error: pattern must be a valid regular expression!");
 
-    let stdin = io::stdin();
+    let stdin = std::io::stdin();
     if atty::is(Stream::Stdin) {
         eprintln!("Error: stdin not redirected");
         process::exit(exitcode::IOERR);
     }
 
     type ChannelData = (String, Result<Option<String>, ScrapeError>);
-    let (tx, mut rx): (Sender<ChannelData>, Receiver<ChannelData>) = mpsc::channel(CHANNEL_BUFFER);
+    let (tx, mut rx) = mpsc::channel::<ChannelData>(CHANNEL_BUFFER);
 
     let client = Client::builder().build::<_, hyper::Body>(HttpsConnector::new());
 

@@ -4,24 +4,22 @@ version = "0.1.5"
 edition = "2021"
 authors = ["Walter Beller-Morales <walter.beller.morales@gmail.com>"]
 license = "MIT"
-readme="README.md"
+readme = "README.md"
 description = "CLI tool to quickly scrape short snippets of text data from multiple HTTP sources"
 categories = ["command-line-utilities"]
 
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 atty = "0.2.14"
 clap = { version = "3.1.8", features = ["derive"] }
 comfy-table = "5.0.1"
 regex = "1"
 hyper = { version = "0.14", features = ["full"] }
-hyper-tls = { version = "0.5.0", features = ["vendored"]}
+hyper-tls = { version = "0.5.0", features = ["vendored"] }
 tokio = { version = "1", features = ["full"] }
 log = "0.4.0"
 env_logger = "0.9.0"
 exitcode = "1.1.2"
 
 [dev-dependencies]
-yup-hyper-mock = "*"
+yup-hyper-mock = "5.14.0"
