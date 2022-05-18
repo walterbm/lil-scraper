@@ -1,9 +1,6 @@
 use comfy_table::{Cell, Color, Table};
 
 pub trait Printer {
-    fn new() -> Self
-    where
-        Self: Sized;
     fn success(&mut self, target: &str, result: &str);
     fn error(&mut self, target: &str, result: &str);
     fn finish(&self);
@@ -13,13 +10,15 @@ pub struct TablePrinter {
     table: Table,
 }
 
-impl Printer for TablePrinter {
-    fn new() -> Self {
+impl TablePrinter {
+    pub fn new() -> Self {
         let mut table = Table::new();
         table.set_header(vec!["Target", "Result"]);
         TablePrinter { table }
     }
+}
 
+impl Printer for TablePrinter {
     fn success(&mut self, target: &str, result: &str) {
         self.table.add_row(vec![target, result]);
     }
@@ -36,11 +35,13 @@ impl Printer for TablePrinter {
 
 pub struct TextPrinter {}
 
-impl Printer for TextPrinter {
-    fn new() -> Self {
+impl TextPrinter {
+    pub fn new() -> Self {
         TextPrinter {}
     }
+}
 
+impl Printer for TextPrinter {
     fn success(&mut self, target: &str, result: &str) {
         println!("{}, {}", target, result);
     }
