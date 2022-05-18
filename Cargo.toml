@@ -1,6 +1,6 @@
 [package]
 name = "lil-scraper"
-version = "0.1.5"
+version = "0.1.7"
 edition = "2021"
 authors = ["Walter Beller-Morales <walter.beller.morales@gmail.com>"]
 license = "MIT"

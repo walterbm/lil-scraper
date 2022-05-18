@@ -10,7 +10,8 @@ env:
   RELEASE_DIR: artifacts
   GITHUB_REF: "${{ github.ref }}"
   WINDOWS_TARGET: x86_64-pc-windows-msvc
-  MACOS_TARGET: x86_64-apple-darwin
+  MACOS_INTEL_TARGET: x86_64-apple-darwin
+  MACOS_ARM_TARGET: aarch64-apple-darwin
   LINUX_AMD64_TARGET: x86_64-unknown-linux-musl
   LINUX_ARM64_TARGET: aarch64-unknown-linux-musl
 
@@ -137,10 +138,15 @@ jobs:
         with:
           name: ${{ env.WINDOWS_TARGET }}
 
-      - name: Download MacOS tarball
+      - name: Download MacOS Intel tarball
         uses: actions/download-artifact@v2
         with:
-          name: ${{ env.MACOS_TARGET }}
+          name: ${{ env.MACOS_INTEL_TARGET }}
+
+      - name: Download MacOS ARM tarball
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.MACOS_ARM_TARGET }}
 
       - name: Release Linux amd64 tarball
         uses: actions/upload-release-asset@v1
@@ -182,12 +188,22 @@ jobs:
           asset_content_type: application/vnd.microsoft.portable-executable
           asset_name: lil-scraper-init.exe
 
-      - name: Release MacOS tarball
+      - name: Release MacOS Intel tarball
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./lil-scraper-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_TARGET }}.tar.gz
+          asset_path: ./lil-scraper-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_INTEL_TARGET }}.tar.gz
           asset_content_type: application/gzip
-          asset_name: lil-scraper-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_TARGET }}.tar.gz
+          asset_name: lil-scraper-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_INTEL_TARGET }}.tar.gz
+
+      - name: Release MacOS ARM tarball
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./lil-scraper-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_ARM_TARGET }}.tar.gz
+          asset_content_type: application/gzip
+          asset_name: lil-scraper-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_ARM_TARGET }}.tar.gz
