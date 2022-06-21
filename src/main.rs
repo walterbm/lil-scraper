@@ -57,7 +57,8 @@ async fn main() {
 
     let scraper = Scraper::new(regex, args.timeout, client);
 
-    for line in stdin.lock().lines() {
+    let lines = stdin.lock().lines();
+    for line in lines {
         let line = line.expect("Error: Could not read line from stdin");
         let tx = tx.clone();
         let scraper = scraper.clone();
