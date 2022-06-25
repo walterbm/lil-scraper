@@ -57,8 +57,7 @@ async fn main() {
 
     let scraper = Scraper::new(regex, args.timeout, client);
 
-    let lines = stdin.lock().lines();
-    for line in lines {
+    stdin.lock().lines().for_each(|line| {
         let line = line.expect("Error: Could not read line from stdin");
         let tx = tx.clone();
         let scraper = scraper.clone();
@@ -75,7 +74,7 @@ async fn main() {
                 .await
                 .map_err(|_| ScrapeError::SendError)
         });
-    }
+    });
 
     // close the channel
     drop(tx);
