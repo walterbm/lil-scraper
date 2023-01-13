@@ -1,3 +1,5 @@
+#![allow(clippy::uninlined_format_args)]
+
 use comfy_table::{Cell, Color, Table};
 
 pub trait Printer {
