@@ -2,7 +2,6 @@ use atty::Stream;
 use clap::Parser;
 use error::ScrapeError;
 use hyper::Client;
-use hyper_tls::HttpsConnector;
 use log::info;
 use regex::Regex;
 use scraper::Scraper;
@@ -52,8 +51,14 @@ async fn main() {
 
     type ChannelData = (String, Result<Option<String>, ScrapeError>);
     let (tx, mut rx) = mpsc::channel::<ChannelData>(CHANNEL_BUFFER);
+    let https = hyper_rustls::HttpsConnectorBuilder::new()
+        .with_native_roots()
+        .https_or_http()
+        .enable_http1()
+        .enable_http2()
+        .build();
 
-    let client = Client::builder().build::<_, hyper::Body>(HttpsConnector::new());
+    let client = Client::builder().build::<_, hyper::Body>(https);
 
     let scraper = Scraper::new(regex, args.timeout, client);
 

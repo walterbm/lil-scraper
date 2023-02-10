@@ -1,4 +1,4 @@
-#![allow(clippy::uninlined_format_args)]
+#![allow(clippy::format_in_format_args)]
 
 use comfy_table::{Cell, Color, Table};
 
