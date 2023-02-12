@@ -29,7 +29,7 @@ where
     }
 
     async fn request(&self, uri: Uri) -> Result<String, ScrapeError> {
-        let data =
+        let mut data =
             match time::timeout(Duration::from_secs(self.timeout), self.client.get(uri)).await {
                 Ok(result) => result.map_err(|_| ScrapeError::RequestFailed),
                 Err(_) => Err(ScrapeError::RequestTimeout),
@@ -39,11 +39,25 @@ where
             return Err(ScrapeError::RequestFailed);
         }
 
+        let headers = data
+            .headers_mut()
+            .drain()
+            .fold(String::new(), |mut acc, header| {
+                if let (Some(name), value) = header {
+                    acc.push_str(&format!(
+                        "< {name}: {}\n",
+                        String::from_utf8_lossy(value.as_bytes())
+                    ));
+                }
+                acc
+            });
+
         let bytes = body::to_bytes(data)
             .await
             .map_err(|_| ScrapeError::InvalidResponse)?;
 
-        Ok(String::from_utf8_lossy(&bytes).into_owned())
+        let body = String::from_utf8_lossy(&bytes).into_owned();
+        Ok(headers + &body)
     }
 
     fn search<'a>(&self, data: &'a str) -> Option<&'a str> {
@@ -62,6 +76,7 @@ mod tests {
 
     mock_connector!(MockResponses {
         "https://test.com" => "HTTP/1.1 200 OK\r\n\
+                               Server: Treasure Trove Cove\r\n\
                                \r\n\
                                High up ledges are out of reach, a jump to get there I'll now teach! Choose your spot with the greatest care, only one jump for bird and bear!"
         "https://bad.com" => "HTTP/1.1 400 Bad Request\r\n\
@@ -71,7 +86,23 @@ mod tests {
     });
 
     #[tokio::test]
-    async fn test_scrape_extracts_matching_data() {
+    async fn test_scrape_extracts_matching_header_data() {
+        let client = hyper::Client::builder().build::<_, hyper::Body>(MockResponses::default());
+
+        let scraper = Scraper {
+            client,
+            regex: Regex::new(r"< server: (.+)").unwrap(),
+            timeout: 5,
+        };
+
+        assert_eq!(
+            scraper.scrape("https://test.com".parse().unwrap()).await,
+            Ok(Some("Treasure Trove Cove".to_string()))
+        );
+    }
+
+    #[tokio::test]
+    async fn test_scrape_extracts_matching_body_data() {
         let client = hyper::Client::builder().build::<_, hyper::Body>(MockResponses::default());
 
         let scraper = Scraper {

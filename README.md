@@ -30,6 +30,12 @@ This is roughly equivalent to running a similar command using `xargs` however `l
 cat urls.txt | xargs -P 0 curl | grep -ioE '<i lang="es">([^<]+)</i>'
 ```
 
+The `lil-scraper` can also search and match on response headers. Headers are normalized to match the curl standard (i.e. lowercased and prepended with `<`). For example:
+
+```bash
+cat urls.txt | lil-scraper  --pattern '< last-modified: (.+)'
+```
+
 ## Command-line options
 
 ### `-p, --pattern` (required)
