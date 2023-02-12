@@ -28,4 +28,4 @@ regex = "1"
 tokio = { version = "1", features = ["full"] }
 
 [dev-dependencies]
-yup-hyper-mock = "5.14.0"
+yup-hyper-mock = "6.0.0"
