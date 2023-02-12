@@ -1,5 +1,3 @@
-#![allow(clippy::format_in_format_args)]
-
 use comfy_table::{Cell, Color, Table};
 
 pub trait Printer {
@@ -45,11 +43,11 @@ impl TextPrinter {
 
 impl Printer for TextPrinter {
     fn success(&mut self, target: &str, result: &str) {
-        println!("{}, {}", target, result);
+        println!("{target}, {result}");
     }
 
     fn error(&mut self, target: &str, result: &str) {
-        println!("{}, {}", target, result);
+        println!("{target}, {result}");
     }
 
     fn finish(&self) {}
