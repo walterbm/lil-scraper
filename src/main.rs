@@ -20,18 +20,18 @@ const CHANNEL_BUFFER: usize = 500;
 
 /// CLI tool to quickly scrape short snippets of text data from multiple HTTP sources
 #[derive(Parser, Debug)]
-#[clap(author, version, about, long_about = None)]
+#[command(author, version, about, long_about = None)]
 struct Args {
     /// Regex pattern to use in search including a target group to extract
     ///
     /// for example:
     ///     --pattern '<title>(.*)</title>'
     ///     --pattern '<meta name="og:site_name" content="([^"]+)"'
-    #[clap(short, long)]
+    #[arg(short, long)]
     pattern: String,
 
     /// Timeout (in seconds)
-    #[clap(short, long, default_value_t = 5)]
+    #[arg(short, long, default_value_t = 5)]
     timeout: u64,
 }
 
@@ -99,4 +99,10 @@ async fn main() {
     }
 
     output.finish();
+}
+
+#[test]
+fn verify_cli() {
+    use clap::CommandFactory;
+    Args::command().debug_assert()
 }
